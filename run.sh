@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Example:
 # ./run.sh pangram ~/Exercism/elm/pangram .
 
