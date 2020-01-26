@@ -1,3 +1,6 @@
+# local node modules
+package-lock.json
+
 # output of the elm-test-runner tool
 results.json
 

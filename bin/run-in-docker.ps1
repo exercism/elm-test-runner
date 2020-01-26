@@ -29,4 +29,4 @@ param (
 )
 
 docker build -t elm-test-runner .
-docker run --mount type=bind,src=${InputDirectory},dst=/solution --mount type=bind,src=${OutputDirectory},dst=/output elm-test-runner pangram /solution /output
+docker run --mount type=bind,src=${InputDirectory},dst=/solution --mount type=bind,src=${OutputDirectory},dst=/output elm-test-runner $Exercise /solution /output
