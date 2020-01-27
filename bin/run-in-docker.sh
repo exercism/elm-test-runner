@@ -41,8 +41,6 @@ docker build -t elm-test-runner .
 
 # run image passing the arguments
 docker run --network none --read-only \
-    -e ELM_HOME=/opt/test-runner/.elm \
-    -e CONTEXT=test-runner \
     --mount type=bind,src=$INPUT,dst=/solution \
     --mount type=bind,src=$OUTPUT,dst=/output \
     --mount type=bind,src=/tmp,dst=/tmp \

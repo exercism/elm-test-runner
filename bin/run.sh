@@ -22,14 +22,9 @@ cp -r $EXERCISE_DIR $TMP_DIR
 # copy locally installed elm and elm-test to /tmp
 cp -r package.json node_modules $TMP_DIR
 
-# If we are in the test runner (read only)
 # Change .elm location to tmp dir
-# CONTEXT variable is set in run-in-docker.sh
-if [[ $CONTEXT = test-runner ]]
-then
-    cp -r .elm $TMP_DIR
-	ELM_HOME=$TMP_DIR/.elm
-fi
+cp -r .elm $TMP_DIR
+export ELM_HOME=$TMP_DIR/.elm
 
 # run elm tests in tmp dir
 pushd $TMP_DIR > /dev/null
