@@ -31,9 +31,24 @@ chmod -R u+rw $TMP_DIR/.elm
 pushd $TMP_DIR > /dev/null
 echo "Running tests"
 
-# npm test will exit(1) if tests fail, so temporarily disable -e mode
+# elm-test will exit(2) if tests fail, so temporarily disable -e mode
 set +e
-npm test --silent -- --report junit > junit.xml
+node_modules/elm-test/bin/elm-test --compiler node_modules/.bin/elm --report junit > junit.xml 2> error.txt
+# elm-test will exit(1) if something crashes (like compiler error)
+if [ $? -eq 1 ]
+then
+   # escape double quotes in message
+   sed -i 's/"/\\"/g' error.txt
+   # build json with message
+   echo '{"status": "fail", "message":"' > $OUTPUT_DIR/results.json
+   cat error.txt >> $OUTPUT_DIR/results.json
+   echo '"}' >> $OUTPUT_DIR/results.json
+   # Replace line endings with \n string
+   # https://stackoverflow.com/questions/38672680/replace-newlines-with-literal-n/38674872
+   sed -i -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' $OUTPUT_DIR/results.json
+   echo "Finished with error"
+   exit 0
+fi
 set -e
 popd > /dev/null
 
