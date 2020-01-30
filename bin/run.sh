@@ -25,6 +25,7 @@ cp -r package.json node_modules $TMP_DIR
 # Change .elm location to tmp dir
 cp -r .elm $TMP_DIR
 export ELM_HOME=$TMP_DIR/.elm
+chmod -R u+rw $TMP_DIR/.elm
 
 # run elm tests in tmp dir
 pushd $TMP_DIR > /dev/null
