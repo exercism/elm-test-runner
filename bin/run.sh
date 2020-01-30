@@ -25,11 +25,16 @@ cp -r package.json node_modules $TMP_DIR
 # Change .elm location to tmp dir
 cp -r .elm $TMP_DIR
 export ELM_HOME=$TMP_DIR/.elm
+chmod -R u+rw $TMP_DIR/.elm
 
 # run elm tests in tmp dir
 pushd $TMP_DIR > /dev/null
 echo "Running tests"
+
+# npm test will exit(1) if tests fail, so temporarily disable -e mode
+set +e
 npm test --silent -- --report junit > junit.xml
+set -e
 popd > /dev/null
 
 # Convert JUnit report to results.json
