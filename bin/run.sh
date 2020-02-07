@@ -40,7 +40,7 @@ then
    # escape double quotes in message
    sed -i 's/"/\\"/g' error.txt
    # build json with message
-   echo '{"status": "fail", "message":"' > $OUTPUT_DIR/results.json
+   echo '{"status": "error", "message":"' > $OUTPUT_DIR/results.json
    cat error.txt >> $OUTPUT_DIR/results.json
    echo '"}' >> $OUTPUT_DIR/results.json
    # Replace line endings with \n string
