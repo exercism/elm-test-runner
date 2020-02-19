@@ -5,13 +5,12 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 
-def _process_xml_tree(tree):
+def _process_xml_tree(root):
     results = {
         'status': 'pass',
         'message': None,
         'tests': []
     }
-    root = tree.getroot()
     for testcase in root.findall('testcase'):   
         case = {
             'name': testcase.attrib['name'],
@@ -41,9 +40,9 @@ def _write_output_file(results, output_path):
             f.write(json.dumps(results))
 
 
-def convert_junitxml_to_json(xml_path, output_path):
-    tree = ET.parse(xml_path)
-    results = _process_xml_tree(tree)
+def convert_junitxml_to_json(xml_string, output_path):
+    root = ET.fromstring(xml_string)
+    results = _process_xml_tree(root)
     _write_output_file(results, output_path)
 
 
@@ -57,4 +56,7 @@ if __name__ == '__main__':
         help='JSON output path'
     )
     opts = parser.parse_args()
-    convert_junitxml_to_json(opts.xml_path, opts.output_path)
+    with open(opts.xml_path, 'r') as file:
+        xml_string = file.read()
+        xml_start = xml_string.find('<?xml version="1.0"?>')
+        convert_junitxml_to_json(xml_string[xml_start:], opts.output_path)
