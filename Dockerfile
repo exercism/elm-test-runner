@@ -4,10 +4,10 @@ FROM node:lts-alpine AS builder
 WORKDIR /opt/test-runner
 
 # Install curl to download executables
-RUN apk add --update --no-cache curl
+RUN apk add --update --no-cache curl tinyproxy sed
 
 # Create a directory for binaries
-RUN mkdir bin
+RUN mkdir bin && cp /usr/bin/tinyproxy /bin/sed bin
 ENV PATH="/opt/test-runner/bin:${PATH}"
 
 # Install jq
@@ -20,10 +20,9 @@ RUN curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/b
   && chmod +x bin/elm
 
 # Install elm-test-rs
-RUN curl -L -o elm-test-rs_linux.zip https://github.com/mpizenberg/elm-test-rs/releases/download/v0.4.1/elm-test-rs_linux.zip \
-  && unzip elm-test-rs_linux.zip \
-  && cp elm-test-rs_linux/elm-test-rs bin \
-  && chmod +x bin/elm-test-rs
+RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-rs/releases/download/v0.5/elm-test-rs_linux.tar.gz \
+  && tar xf elm-test-rs_linux.tar.gz \
+  && mv elm-test-rs bin
 
 # Build the elm cache in both .elm/ and elm-stuff/
 ENV ELM_HOME="/opt/test-runner/.elm"
