@@ -32,11 +32,12 @@ RUN curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/master/te
   && elm-test-rs || true
 
 # Pack together things to copy to the runner container
-RUN tar cf cache.tar bin elm-stuff .elm elm.json
+COPY bin/run.sh bin/run.sh
+RUN tar cf cache.tar elm-stuff .elm elm.json
 
 # Lightweight runner container
 FROM node:lts-alpine
 WORKDIR /opt/test-runner
+COPY --from=builder /opt/test-runner/bin bin
 COPY --from=builder /opt/test-runner/cache.tar .
-COPY bin/run.sh bin/run.sh
 ENTRYPOINT [ "bin/run.sh" ]

@@ -18,7 +18,7 @@ tar xf cache.tar -C $WORK_DIR
 cd $WORK_DIR
 
 # Add bin/ to the path to make available elm and elm-test-rs.
-export PATH=$WORK_DIR/bin:${PATH}
+export PATH=/opt/test-runner/bin:${PATH}
 
 # Use the cache in .elm/ by redefining the elm home directory.
 export ELM_HOME=$WORK_DIR/.elm
