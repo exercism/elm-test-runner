@@ -32,7 +32,6 @@ RUN curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/master/te
   && elm-test-rs || true
 
 # Pack together things to copy to the runner container
-RUN ls -l elm-stuff/tests-0.19.1/
 RUN tar cf cache.tar bin elm-stuff .elm elm.json
 
 # Lightweight runner container
