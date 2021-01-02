@@ -26,6 +26,7 @@ export ELM_HOME=$WORK_DIR/.elm
 # Setup a proxy to fail requests faster in offline mode for the elm compiler.
 # Otherwise, the elm compiler freezes for 5s before switching to offline mode.
 cat <<EOT >> proxy.conf
+LogLevel Error
 Port 4343
 Listen 127.0.0.1
 MaxClients 100
