@@ -44,7 +44,7 @@ sed -i 's/skip <|//g' tests/Tests.elm
 
 # Temporarily disable -e mode
 set +e
-elm-test-rs --report exercism --connectivity offline > $OUTPUT_DIR/results_temp.json 2> stderr.txt
+elm-test-rs --report exercism --connectivity offline > $OUTPUT_DIR/results.json 2> stderr.txt
 STATUS=$?
 cat stderr.txt
 # elm-test-rs will exit(0) if tests pass, exit(2) if tests fail
@@ -54,12 +54,5 @@ if [ $STATUS -ne 0 ] && [ $STATUS -ne 2 ]; then
    exit 0
 fi
 set -e
-
-# Set "version" field to 2.
-# And temporarily set `test_code` to null.
-cat $OUTPUT_DIR/results_temp.json \
-   | jq '(.version) |= 2' \
-   | jq '(.tests[].test_code) |= null' \
-   > $OUTPUT_DIR/results.json
 
 echo Finished
