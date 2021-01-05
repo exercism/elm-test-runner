@@ -1,8 +1,8 @@
 name: Push to DockerHub
 
-on: pull_request
-  # push:
-  #   branches: [master]
+on:
+  push:
+    branches: [master]
 
 jobs:
   dockerhub:
