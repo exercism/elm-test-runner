@@ -1,61 +1,58 @@
-#!/usr/bin/env bash
-
-# Example:
-# bin/run.sh pangram ~/exercism/elm/pangram .
+#!/bin/sh
 
 set -e # Make script exit when a command fail.
 set -u # Exit on usage of undeclared variable.
 # set -x # Trace what gets executed.
 set -o pipefail # Catch failures in pipes.
 
-EXERCISE_SLUG="$1"
-EXERCISE_DIR=$(readlink -f $2)
-OUTPUT_DIR=$(readlink -f $3)
-TMP_DIR="/tmp/exercism-elm/$EXERCISE_SLUG"
+# Command line arguments
+SLUG="$1"
+INPUT_DIR="$2"
+OUTPUT_DIR="$3"
 
-# copy exercise dir content into /tmp
-# since exercise dir is not supposed to be writable
-echo "Copying exercise files into $TMP_DIR"
-mkdir -p $TMP_DIR && rm -rf $TMP_DIR
-cp -r $EXERCISE_DIR $TMP_DIR
+# Setup a working directory
+WORK_DIR=/opt/test-runner/app
+cp -rp $INPUT_DIR $WORK_DIR
+mkdir -p $WORK_DIR/elm-stuff && rm -rf $WORK_DIR/elm-stuff
+tar xf cache.tar -C $WORK_DIR
+cd $WORK_DIR
 
-# copy locally installed elm and elm-test to /tmp
-cp -r package.json node_modules $TMP_DIR
+# Add bin/ to the path to make available elm and elm-test-rs.
+export PATH=/opt/test-runner/bin:${PATH}
 
-# Change .elm location to tmp dir
-cp -r .elm $TMP_DIR
-export ELM_HOME=$TMP_DIR/.elm
-chmod -R u+rw $TMP_DIR/.elm
+# Use the cache in .elm/ by redefining the elm home directory.
+export ELM_HOME=$WORK_DIR/.elm
 
-# run elm tests in tmp dir
-pushd $TMP_DIR > /dev/null
-echo "Running tests"
+# Setup a proxy to fail requests faster in offline mode for the elm compiler.
+# Otherwise, the elm compiler freezes for 5s before switching to offline mode.
+cat <<EOT >> proxy.conf
+LogLevel Error
+Port 4343
+Listen 127.0.0.1
+MaxClients 100
+StartServers 1
+Filter "filter.conf"
+FilterDefaultDeny Yes
+EOT
 
-# elm-test will exit(2) if tests fail, so temporarily disable -e mode
+touch filter.conf
+export https_proxy=127.0.0.1:4343
+tinyproxy -d -c proxy.conf &
+
+# Un-skip all the skipped tests
+sed -i 's/skip <|//g' tests/Tests.elm
+
+# Temporarily disable -e mode
 set +e
-node_modules/elm-test/bin/elm-test --compiler node_modules/.bin/elm --report junit > junit.xml 2> error.txt
-# elm-test will exit(1) if something crashes (like compiler error)
-if [ $? -eq 1 ]
-then
-   # escape double quotes in message
-   sed -i 's/"/\\"/g' error.txt
-   # build json with message
-   echo '{"status": "error", "message":"' > $OUTPUT_DIR/results.json
-   cat error.txt >> $OUTPUT_DIR/results.json
-   echo '"}' >> $OUTPUT_DIR/results.json
-   # Replace line endings with \n string
-   # https://stackoverflow.com/questions/38672680/replace-newlines-with-literal-n/38674872
-   sed -i -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' $OUTPUT_DIR/results.json
+elm-test-rs --report exercism --connectivity offline > $OUTPUT_DIR/results.json 2> stderr.txt
+STATUS=$?
+cat stderr.txt
+# elm-test-rs will exit(0) if tests pass, exit(2) if tests fail
+if [ $STATUS -ne 0 ] && [ $STATUS -ne 2 ]; then
+   jq -n --rawfile m stderr.txt '{version: 2, status: "error", message:$m}' > $OUTPUT_DIR/results.json
    echo "Finished with error"
    exit 0
 fi
 set -e
-popd > /dev/null
-
-# Convert JUnit report to results.json
-# At some future date, this script should be replaced
-# with one provided by exercism/automated-tests
-echo "Converting Junit output to exercism output"
-python3 process_results.py $TMP_DIR/junit.xml $OUTPUT_DIR/results.json
 
 echo Finished
