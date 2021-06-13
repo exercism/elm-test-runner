@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import NormalizeDeclaration
+import ExtractTestCode
 import Platform exposing (Program)
 
 
@@ -57,5 +57,5 @@ subscriptions _ =
 
 
 transform : InputType -> OutputType
-transform unNormalised =
-    NormalizeDeclaration.normalizeWithoutCheck unNormalised
+transform testModule =
+    ExtractTestCode.extractTestCode testModule

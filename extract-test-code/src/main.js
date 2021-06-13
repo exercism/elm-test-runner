@@ -3105,21 +3105,15 @@ var $elm$core$List$concatMap = F2(
 var $elm$parser$Parser$deadEndsToString = function (deadEnds) {
 	return 'TODO deadEndsToString';
 };
-var $stil4m$elm_syntax$Elm$Processing$ProcessContext = function (a) {
-	return {$: 'ProcessContext', a: a};
-};
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $stil4m$elm_syntax$Elm$Processing$init = $stil4m$elm_syntax$Elm$Processing$ProcessContext($elm$core$Dict$empty);
-var $elm$core$Debug$log = _Debug_log;
 var $stil4m$elm_syntax$Elm$Syntax$Expression$Application = function (a) {
 	return {$: 'Application', a: a};
 };
+var $elm$core$Debug$log = _Debug_log;
 var $stil4m$elm_syntax$Elm$Syntax$Node$value = function (_v0) {
 	var v = _v0.b;
 	return v;
 };
-var $author$project$NormalizeDeclaration$normalizeTest = function (expressions) {
+var $author$project$ExtractTestCode$extractFromTestFunction = function (expressions) {
 	if ((((expressions.b && (expressions.a.$ === 'Literal')) && expressions.b.b) && (expressions.b.a.$ === 'LambdaExpression')) && (!expressions.b.b.b)) {
 		var name = expressions.a.a;
 		var _v1 = expressions.b;
@@ -3135,21 +3129,21 @@ var $author$project$NormalizeDeclaration$normalizeTest = function (expressions) 
 		return _List_Nil;
 	}
 };
-var $author$project$NormalizeDeclaration$normalizeDescribe = function (expressions) {
+var $author$project$ExtractTestCode$extractFromDescribeFunction = function (expressions) {
 	if (((expressions.b && expressions.b.b) && (expressions.b.a.$ === 'ListExpr')) && (!expressions.b.b.b)) {
 		var _v7 = expressions.b;
 		var testOrDescribes = _v7.a.a;
 		var _v8 = A2($elm$core$Debug$log, 'describe', 'describe');
 		return A2(
 			$elm$core$List$concatMap,
-			$author$project$NormalizeDeclaration$normalizeExpression,
+			$author$project$ExtractTestCode$extractFromExpression,
 			A2($elm$core$List$map, $stil4m$elm_syntax$Elm$Syntax$Node$value, testOrDescribes));
 	} else {
 		return _List_Nil;
 	}
 };
-var $author$project$NormalizeDeclaration$normalizeExpression = function (expression) {
-	normalizeExpression:
+var $author$project$ExtractTestCode$extractFromExpression = function (expression) {
+	extractFromExpression:
 	while (true) {
 		switch (expression.$) {
 			case 'Application':
@@ -3161,11 +3155,11 @@ var $author$project$NormalizeDeclaration$normalizeExpression = function (express
 					var xs = expressions.b;
 					if (functionName === 'describe') {
 						var _v3 = A2($elm$core$Debug$log, 'describe function application', 'describe function application');
-						return $author$project$NormalizeDeclaration$normalizeDescribe(xs);
+						return $author$project$ExtractTestCode$extractFromDescribeFunction(xs);
 					} else {
 						if (functionName === 'test') {
 							var _v4 = A2($elm$core$Debug$log, 'test function application', 'test function application');
-							return $author$project$NormalizeDeclaration$normalizeTest(xs);
+							return $author$project$ExtractTestCode$extractFromTestFunction(xs);
 						} else {
 							return _List_Nil;
 						}
@@ -3187,7 +3181,7 @@ var $author$project$NormalizeDeclaration$normalizeExpression = function (express
 							_List_fromArray(
 								[right])));
 					expression = $temp$expression;
-					continue normalizeExpression;
+					continue extractFromExpression;
 				} else {
 					return _List_Nil;
 				}
@@ -3196,27 +3190,33 @@ var $author$project$NormalizeDeclaration$normalizeExpression = function (express
 		}
 	}
 };
-var $author$project$NormalizeDeclaration$normalizeFunction = function (functionDeclaration) {
+var $author$project$ExtractTestCode$extractFromFunction = function (functionDeclaration) {
 	var name = $stil4m$elm_syntax$Elm$Syntax$Node$value(
 		$stil4m$elm_syntax$Elm$Syntax$Node$value(functionDeclaration.declaration).name);
 	var expression = $stil4m$elm_syntax$Elm$Syntax$Node$value(
 		$stil4m$elm_syntax$Elm$Syntax$Node$value(functionDeclaration.declaration).expression);
 	if (name === 'tests') {
 		var _v0 = A2($elm$core$Debug$log, 'tests function declaration', 'tests function declaration');
-		return $author$project$NormalizeDeclaration$normalizeExpression(expression);
+		return $author$project$ExtractTestCode$extractFromExpression(expression);
 	} else {
 		return _List_Nil;
 	}
 };
-var $author$project$NormalizeDeclaration$normalizeDeclaration = function (declaration) {
+var $author$project$ExtractTestCode$extractFromDeclaration = function (declaration) {
 	if (declaration.$ === 'FunctionDeclaration') {
 		var functionDeclaration = declaration.a;
 		var _v1 = A2($elm$core$Debug$log, 'functiondeclaration', 'functiondeclaration');
-		return $author$project$NormalizeDeclaration$normalizeFunction(functionDeclaration);
+		return $author$project$ExtractTestCode$extractFromFunction(functionDeclaration);
 	} else {
 		return _List_Nil;
 	}
 };
+var $stil4m$elm_syntax$Elm$Processing$ProcessContext = function (a) {
+	return {$: 'ProcessContext', a: a};
+};
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $stil4m$elm_syntax$Elm$Processing$init = $stil4m$elm_syntax$Elm$Processing$ProcessContext($elm$core$Dict$empty);
 var $stil4m$elm_syntax$Elm$Parser$State$State = function (a) {
 	return {$: 'State', a: a};
 };
@@ -9945,96 +9945,6 @@ var $stil4m$structured_writer$StructuredWriter$Breaked = function (a) {
 	return {$: 'Breaked', a: a};
 };
 var $stil4m$structured_writer$StructuredWriter$breaked = $stil4m$structured_writer$StructuredWriter$Breaked;
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
-var $elm$core$String$repeatHelp = F3(
-	function (n, chunk, result) {
-		return (n <= 0) ? result : A3(
-			$elm$core$String$repeatHelp,
-			n >> 1,
-			_Utils_ap(chunk, chunk),
-			(!(n & 1)) ? result : _Utils_ap(result, chunk));
-	});
-var $elm$core$String$repeat = F2(
-	function (n, chunk) {
-		return A3($elm$core$String$repeatHelp, n, chunk, '');
-	});
-var $stil4m$structured_writer$StructuredWriter$asIndent = function (amount) {
-	return A2($elm$core$String$repeat, amount, ' ');
-};
-var $stil4m$structured_writer$StructuredWriter$writeIndented = F2(
-	function (indent_, w) {
-		switch (w.$) {
-			case 'Sep':
-				var _v1 = w.a;
-				var pre = _v1.a;
-				var sep = _v1.b;
-				var post = _v1.c;
-				var differentLines = w.b;
-				var items = w.c;
-				var seperator = differentLines ? ('\n' + ($stil4m$structured_writer$StructuredWriter$asIndent(indent_) + sep)) : sep;
-				return $elm$core$String$concat(
-					_List_fromArray(
-						[
-							pre,
-							A2(
-							$elm$core$String$join,
-							seperator,
-							A2(
-								$elm$core$List$map,
-								A2(
-									$elm$core$Basics$composeR,
-									$elm$core$Basics$identity,
-									$stil4m$structured_writer$StructuredWriter$writeIndented(indent_)),
-								items)),
-							post
-						]));
-			case 'Breaked':
-				var items = w.a;
-				return A2(
-					$elm$core$String$join,
-					'\n' + $stil4m$structured_writer$StructuredWriter$asIndent(indent_),
-					A2(
-						$elm$core$List$concatMap,
-						A2(
-							$elm$core$Basics$composeR,
-							$stil4m$structured_writer$StructuredWriter$writeIndented(0),
-							$elm$core$String$split('\n')),
-						items));
-			case 'Str':
-				var s = w.a;
-				return s;
-			case 'Indent':
-				var n = w.a;
-				var next = w.b;
-				return _Utils_ap(
-					$stil4m$structured_writer$StructuredWriter$asIndent(n + indent_),
-					A2($stil4m$structured_writer$StructuredWriter$writeIndented, n + indent_, next));
-			case 'Spaced':
-				var items = w.a;
-				return A2(
-					$elm$core$String$join,
-					' ',
-					A2(
-						$elm$core$List$map,
-						$stil4m$structured_writer$StructuredWriter$writeIndented(indent_),
-						items));
-			case 'Joined':
-				var items = w.a;
-				return $elm$core$String$concat(
-					A2(
-						$elm$core$List$map,
-						$stil4m$structured_writer$StructuredWriter$writeIndented(indent_),
-						items));
-			default:
-				var x = w.a;
-				var y = w.b;
-				return _Utils_ap(
-					A2($stil4m$structured_writer$StructuredWriter$writeIndented, indent_, x),
-					A2($stil4m$structured_writer$StructuredWriter$writeIndented, indent_, y));
-		}
-	});
-var $stil4m$structured_writer$StructuredWriter$write = $stil4m$structured_writer$StructuredWriter$writeIndented(0);
 var $stil4m$structured_writer$StructuredWriter$Str = function (a) {
 	return {$: 'Str', a: a};
 };
@@ -10328,6 +10238,96 @@ var $stil4m$elm_syntax$Elm$Writer$writePattern = function (_v0) {
 	}
 };
 var $elm$core$String$contains = _String_contains;
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $stil4m$structured_writer$StructuredWriter$asIndent = function (amount) {
+	return A2($elm$core$String$repeat, amount, ' ');
+};
+var $stil4m$structured_writer$StructuredWriter$writeIndented = F2(
+	function (indent_, w) {
+		switch (w.$) {
+			case 'Sep':
+				var _v1 = w.a;
+				var pre = _v1.a;
+				var sep = _v1.b;
+				var post = _v1.c;
+				var differentLines = w.b;
+				var items = w.c;
+				var seperator = differentLines ? ('\n' + ($stil4m$structured_writer$StructuredWriter$asIndent(indent_) + sep)) : sep;
+				return $elm$core$String$concat(
+					_List_fromArray(
+						[
+							pre,
+							A2(
+							$elm$core$String$join,
+							seperator,
+							A2(
+								$elm$core$List$map,
+								A2(
+									$elm$core$Basics$composeR,
+									$elm$core$Basics$identity,
+									$stil4m$structured_writer$StructuredWriter$writeIndented(indent_)),
+								items)),
+							post
+						]));
+			case 'Breaked':
+				var items = w.a;
+				return A2(
+					$elm$core$String$join,
+					'\n' + $stil4m$structured_writer$StructuredWriter$asIndent(indent_),
+					A2(
+						$elm$core$List$concatMap,
+						A2(
+							$elm$core$Basics$composeR,
+							$stil4m$structured_writer$StructuredWriter$writeIndented(0),
+							$elm$core$String$split('\n')),
+						items));
+			case 'Str':
+				var s = w.a;
+				return s;
+			case 'Indent':
+				var n = w.a;
+				var next = w.b;
+				return _Utils_ap(
+					$stil4m$structured_writer$StructuredWriter$asIndent(n + indent_),
+					A2($stil4m$structured_writer$StructuredWriter$writeIndented, n + indent_, next));
+			case 'Spaced':
+				var items = w.a;
+				return A2(
+					$elm$core$String$join,
+					' ',
+					A2(
+						$elm$core$List$map,
+						$stil4m$structured_writer$StructuredWriter$writeIndented(indent_),
+						items));
+			case 'Joined':
+				var items = w.a;
+				return $elm$core$String$concat(
+					A2(
+						$elm$core$List$map,
+						$stil4m$structured_writer$StructuredWriter$writeIndented(indent_),
+						items));
+			default:
+				var x = w.a;
+				var y = w.b;
+				return _Utils_ap(
+					A2($stil4m$structured_writer$StructuredWriter$writeIndented, indent_, x),
+					A2($stil4m$structured_writer$StructuredWriter$writeIndented, indent_, y));
+		}
+	});
+var $stil4m$structured_writer$StructuredWriter$write = $stil4m$structured_writer$StructuredWriter$writeIndented(0);
 var $stil4m$elm_syntax$Elm$Writer$parensIfContainsSpaces = function (w) {
 	return A2(
 		$elm$core$String$contains,
@@ -10869,7 +10869,7 @@ var $stil4m$elm_syntax$Elm$Writer$writeLetDeclaration = function (_v0) {
 		return A2($stil4m$elm_syntax$Elm$Writer$writeDestructuring, pattern, expression);
 	}
 };
-var $author$project$NormalizeDeclaration$writeTest = function (_v0) {
+var $author$project$ExtractTestCode$testToWriter = function (_v0) {
 	var name = _v0.a;
 	var code = _v0.b;
 	return $stil4m$structured_writer$StructuredWriter$breaked(
@@ -10880,30 +10880,30 @@ var $author$project$NormalizeDeclaration$writeTest = function (_v0) {
 				A2($stil4m$elm_syntax$Elm$Syntax$Node$Node, $stil4m$elm_syntax$Elm$Syntax$Range$emptyRange, code))
 			]));
 };
-var $author$project$NormalizeDeclaration$toString = function (tests) {
+var $author$project$ExtractTestCode$testsToString = function (tests) {
 	return $stil4m$structured_writer$StructuredWriter$write(
 		$stil4m$structured_writer$StructuredWriter$breaked(
-			A2($elm$core$List$map, $author$project$NormalizeDeclaration$writeTest, tests)));
+			A2($elm$core$List$map, $author$project$ExtractTestCode$testToWriter, tests)));
 };
-var $author$project$NormalizeDeclaration$normalizeWithoutCheck = function (original) {
+var $author$project$ExtractTestCode$extractTestCode = function (original) {
 	var _v0 = $stil4m$elm_syntax$Elm$Parser$parse(original);
 	if (_v0.$ === 'Err') {
 		var error = _v0.a;
 		return 'Failed: ' + $elm$parser$Parser$deadEndsToString(error);
 	} else {
 		var rawFile = _v0.a;
-		return $author$project$NormalizeDeclaration$toString(
+		return $author$project$ExtractTestCode$testsToString(
 			A2(
 				$elm$core$List$concatMap,
-				$author$project$NormalizeDeclaration$normalizeDeclaration,
+				$author$project$ExtractTestCode$extractFromDeclaration,
 				A2(
 					$elm$core$List$map,
 					$stil4m$elm_syntax$Elm$Syntax$Node$value,
 					A2($stil4m$elm_syntax$Elm$Processing$process, $stil4m$elm_syntax$Elm$Processing$init, rawFile).declarations)));
 	}
 };
-var $author$project$Main$transform = function (unNormalised) {
-	return $author$project$NormalizeDeclaration$normalizeWithoutCheck(unNormalised);
+var $author$project$Main$transform = function (testModule) {
+	return $author$project$ExtractTestCode$extractTestCode(testModule);
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {

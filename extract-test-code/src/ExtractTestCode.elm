@@ -1,4 +1,4 @@
-module NormalizeDeclaration exposing (..)
+module ExtractTestCode exposing (..)
 
 import Elm.Parser
 import Elm.Processing exposing (init, process)
@@ -11,8 +11,8 @@ import Parser
 import StructuredWriter as Writer exposing (..)
 
 
-normalizeWithoutCheck : String -> String
-normalizeWithoutCheck original =
+extractTestCode : String -> String
+extractTestCode original =
     case Elm.Parser.parse original of
         Err error ->
             "Failed: " ++ Parser.deadEndsToString error
@@ -21,39 +21,39 @@ normalizeWithoutCheck original =
             process init rawFile
                 |> .declarations
                 |> List.map Node.value
-                |> List.concatMap normalizeDeclaration
-                |> toString
+                |> List.concatMap extractFromDeclaration
+                |> testsToString
 
 
-toString : List ( String, Expression ) -> String
-toString tests =
-    List.map writeTest tests
+testsToString : List ( String, Expression ) -> String
+testsToString tests =
+    List.map testToWriter tests
         |> breaked
         |> write
 
 
-writeTest : ( String, Expression ) -> Writer
-writeTest ( name, code ) =
+testToWriter : ( String, Expression ) -> Writer
+testToWriter ( name, code ) =
     [ string name, writeExpression (Node.Node emptyRange code) ]
         |> breaked
 
 
-normalizeDeclaration : Declaration -> List ( String, Expression )
-normalizeDeclaration declaration =
+extractFromDeclaration : Declaration -> List ( String, Expression )
+extractFromDeclaration declaration =
     case declaration of
         Declaration.FunctionDeclaration functionDeclaration ->
             let
                 _ =
                     Debug.log "functiondeclaration" "functiondeclaration"
             in
-            normalizeFunction functionDeclaration
+            extractFromFunction functionDeclaration
 
         _ ->
             []
 
 
-normalizeFunction : Function -> List ( String, Expression )
-normalizeFunction functionDeclaration =
+extractFromFunction : Function -> List ( String, Expression )
+extractFromFunction functionDeclaration =
     let
         name =
             functionDeclaration.declaration |> Node.value |> .name |> Node.value
@@ -69,14 +69,14 @@ normalizeFunction functionDeclaration =
             _ =
                 Debug.log "tests function declaration" "tests function declaration"
         in
-        normalizeExpression expression
+        extractFromExpression expression
 
     else
         []
 
 
-normalizeExpression : Expression -> List ( String, Expression )
-normalizeExpression expression =
+extractFromExpression : Expression -> List ( String, Expression )
+extractFromExpression expression =
     case expression of
         Application nodeExpressions ->
             let
@@ -90,14 +90,14 @@ normalizeExpression expression =
                             _ =
                                 Debug.log "describe function application" "describe function application"
                         in
-                        normalizeDescribe xs
+                        extractFromDescribeFunction xs
 
                     else if functionName == "test" then
                         let
                             _ =
                                 Debug.log "test function application" "test function application"
                         in
-                        normalizeTest xs
+                        extractFromTestFunction xs
 
                     else
                         []
@@ -108,7 +108,7 @@ normalizeExpression expression =
         OperatorApplication operator direction left right ->
             case Node.value left of
                 Application nodeExpressions2 ->
-                    normalizeExpression (Application (nodeExpressions2 ++ [ right ]))
+                    extractFromExpression (Application (nodeExpressions2 ++ [ right ]))
 
                 _ ->
                     []
@@ -121,15 +121,15 @@ normalizeExpression expression =
 list (of tests or desribe functions, which return a Test)
 parameter. We want to process this list
 -}
-normalizeDescribe : List Expression -> List ( String, Expression )
-normalizeDescribe expressions =
+extractFromDescribeFunction : List Expression -> List ( String, Expression )
+extractFromDescribeFunction expressions =
     case expressions of
         _ :: (ListExpr testOrDescribes) :: [] ->
             let
                 _ =
                     Debug.log "describe" "describe"
             in
-            List.concatMap normalizeExpression (List.map Node.value testOrDescribes)
+            List.concatMap extractFromExpression (List.map Node.value testOrDescribes)
 
         _ ->
             []
@@ -139,8 +139,8 @@ normalizeDescribe expressions =
 the test, and then a function for the test. Only lambdas are
 supported as the second parameter
 -}
-normalizeTest : List Expression -> List ( String, Expression )
-normalizeTest expressions =
+extractFromTestFunction : List Expression -> List ( String, Expression )
+extractFromTestFunction expressions =
     case expressions of
         (Literal name) :: (LambdaExpression test) :: [] ->
             let
