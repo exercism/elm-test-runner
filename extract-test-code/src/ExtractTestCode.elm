@@ -4,18 +4,19 @@ import Elm.Parser
 import Elm.Processing exposing (init, process)
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.Node as Node exposing (Node)
+import Elm.Syntax.Node as Node
 import Elm.Syntax.Range exposing (emptyRange)
 import Elm.Writer exposing (writeExpression)
 import Parser
-import StructuredWriter as Writer exposing (..)
+import String exposing (fromInt)
+import StructuredWriter exposing (..)
 
 
 extractTestCode : String -> String
 extractTestCode original =
     case Elm.Parser.parse original of
         Err error ->
-            "Failed: " ++ Parser.deadEndsToString error
+            "Failed: " ++ deadEndsToString error
 
         Ok rawFile ->
             process init rawFile
@@ -23,6 +24,61 @@ extractTestCode original =
                 |> List.map Node.value
                 |> List.concatMap extractFromDeclaration
                 |> testsToString
+
+
+deadEndsToString deadEnds =
+    List.map deadEndToString deadEnds
+        |> String.join "/n"
+
+
+deadEndToString deadEnd =
+    "( " ++ fromInt deadEnd.row ++ ", " ++ fromInt deadEnd.col ++ " ): " ++ problemToString deadEnd.problem
+
+
+problemToString : Parser.Problem -> String
+problemToString problem =
+    case problem of
+        Parser.Expecting string ->
+            "Expecting string: " ++ string
+
+        Parser.ExpectingInt ->
+            "Expecting int"
+
+        Parser.ExpectingHex ->
+            "Expecting int"
+
+        Parser.ExpectingOctal ->
+            "Expecting int"
+
+        Parser.ExpectingBinary ->
+            "Expecting int"
+
+        Parser.ExpectingFloat ->
+            "Expecting int"
+
+        Parser.ExpectingNumber ->
+            "Expecting int"
+
+        Parser.ExpectingVariable ->
+            "Expecting int"
+
+        Parser.ExpectingSymbol string ->
+            "Expecting symbol: " ++ string
+
+        Parser.ExpectingKeyword string ->
+            "Expecting keyword: " ++ string
+
+        Parser.ExpectingEnd ->
+            "Expecting int"
+
+        Parser.UnexpectedChar ->
+            "Expecting int"
+
+        Parser.Problem string ->
+            "Expecting keywork: " ++ string
+
+        Parser.BadRepeat ->
+            "Bad repeat"
 
 
 testsToString : List ( String, Expression ) -> String
@@ -42,10 +98,6 @@ extractFromDeclaration : Declaration -> List ( String, Expression )
 extractFromDeclaration declaration =
     case declaration of
         Declaration.FunctionDeclaration functionDeclaration ->
-            let
-                _ =
-                    Debug.log "functiondeclaration" "functiondeclaration"
-            in
             extractFromFunction functionDeclaration
 
         _ ->
@@ -65,10 +117,6 @@ extractFromFunction functionDeclaration =
     -- We could instead require it to have a type annotation that specifies a
     -- function with no parameters that returns a Test
     if name == "tests" then
-        let
-            _ =
-                Debug.log "tests function declaration" "tests function declaration"
-        in
         extractFromExpression expression
 
     else
@@ -86,17 +134,9 @@ extractFromExpression expression =
             case expressions of
                 (FunctionOrValue _ functionName) :: xs ->
                     if functionName == "describe" then
-                        let
-                            _ =
-                                Debug.log "describe function application" "describe function application"
-                        in
                         extractFromDescribeFunction xs
 
                     else if functionName == "test" then
-                        let
-                            _ =
-                                Debug.log "test function application" "test function application"
-                        in
                         extractFromTestFunction xs
 
                     else
@@ -105,7 +145,7 @@ extractFromExpression expression =
                 _ ->
                     []
 
-        OperatorApplication operator direction left right ->
+        OperatorApplication _ _ left right ->
             case Node.value left of
                 Application nodeExpressions2 ->
                     extractFromExpression (Application (nodeExpressions2 ++ [ right ]))
@@ -125,10 +165,6 @@ extractFromDescribeFunction : List Expression -> List ( String, Expression )
 extractFromDescribeFunction expressions =
     case expressions of
         _ :: (ListExpr testOrDescribes) :: [] ->
-            let
-                _ =
-                    Debug.log "describe" "describe"
-            in
             List.concatMap extractFromExpression (List.map Node.value testOrDescribes)
 
         _ ->
@@ -143,10 +179,6 @@ extractFromTestFunction : List Expression -> List ( String, Expression )
 extractFromTestFunction expressions =
     case expressions of
         (Literal name) :: (LambdaExpression test) :: [] ->
-            let
-                _ =
-                    Debug.log "test" "test"
-            in
             [ ( name, Node.value test.expression ) ]
 
         _ ->
