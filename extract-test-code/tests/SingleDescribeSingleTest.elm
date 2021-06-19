@@ -24,16 +24,7 @@ tests =
                 in
                 canFastAttack knightIsAwake
                     |> Expect.equal False
-        , test "Can execute fast attack if knight is sleeping" <|
-            \\_ ->
-                let
-                    knightIsAwake =
-                        False
-                in
-                canFastAttack knightIsAwake
-                    |> Expect.equal True
-        ]
-"""
+        ]"""
                 |> ExtractTestCode.extractTestCode
                 |> Expect.equal """Cannot execute fast attack if knight is awake
 let
@@ -42,12 +33,4 @@ let
   knightIsAwake  =
       True
 in
-  canFastAttack knightIsAwake |> Expect.equal False
-Can execute fast attack if knight is sleeping
-let
-  
-  
-  knightIsAwake  =
-      False
-in
-  canFastAttack knightIsAwake |> Expect.equal True"""
+  canFastAttack knightIsAwake |> Expect.equal False"""
