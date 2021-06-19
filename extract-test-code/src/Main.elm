@@ -1,61 +1,18 @@
 port module Main exposing (main)
 
 import ExtractTestCode
-import Platform exposing (Program)
 
 
-type alias InputType =
-    String
+port stdin : (String -> msg) -> Sub msg
 
 
-type alias OutputType =
-    String
+port stdout : String -> Cmd msg
 
 
-port get : (InputType -> msg) -> Sub msg
-
-
-port put : OutputType -> Cmd msg
-
-
-main : Program Flags Model Msg
+main : Program () () String
 main =
     Platform.worker
-        { init = init2
-        , update = update
-        , subscriptions = subscriptions
+        { init = always ( (), Cmd.none )
+        , subscriptions = \_ -> stdin identity
+        , update = \input _ -> ( (), stdout (ExtractTestCode.extractTestCode input) )
         }
-
-
-type alias Model =
-    ()
-
-
-type Msg
-    = Input String
-
-
-type alias Flags =
-    ()
-
-
-init2 : Flags -> ( Model, Cmd Msg )
-init2 _ =
-    ( (), Cmd.none )
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        Input input ->
-            ( model, put (transform input) )
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    get Input
-
-
-transform : InputType -> OutputType
-transform testModule =
-    ExtractTestCode.extractTestCode testModule
