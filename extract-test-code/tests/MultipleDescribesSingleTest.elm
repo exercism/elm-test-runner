@@ -7,7 +7,7 @@ import Test exposing (..)
 
 tests : Test
 tests =
-    test "Can extract single test in describe wrapper" <|
+    test "Can extract tests in multiple describe wrappers" <|
         \_ ->
             """module AnnalynsInfiltrationTests exposing (tests)
 
