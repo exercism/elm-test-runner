@@ -44,7 +44,7 @@ sed -i 's/skip <|//g' tests/Tests.elm
 
 # Temporarily disable -e mode
 set +e
-elm-test-rs --quiet --report exercism --connectivity offline > $OUTPUT_DIR/results.json 2> stderr.txt
+elm-test-rs -v --report exercism --offline > $OUTPUT_DIR/results.json 2> stderr.txt
 STATUS=$?
 cat stderr.txt
 # elm-test-rs will exit(0) if tests pass, exit(2) if tests fail
