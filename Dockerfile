@@ -30,10 +30,17 @@ RUN curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/master/te
   && mkdir src \
   && elm-test-rs init \
   && elm-test-rs || true
+RUN tar cf cache.tar elm-stuff .elm elm.json
+
+# Build the test code extractor
+COPY extract-test-code extract-test-code
+RUN cd extract-test-code \
+  && elm make --optimize src/Main.elm --output=src/main.js \
+  && cd src \
+  && cp cli.js main.js ../../bin
 
 # Pack together things to copy to the runner container
 COPY bin/run.sh bin/run.sh
-RUN tar cf cache.tar elm-stuff .elm elm.json
 
 # Lightweight runner container
 FROM node:lts-alpine
