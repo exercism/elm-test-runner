@@ -49,7 +49,7 @@ STATUS=$?
 cat stderr.txt
 # elm-test-rs will exit(0) if tests pass, exit(2) if tests fail
 if [ $STATUS -ne 0 ] && [ $STATUS -ne 2 ]; then
-   jq -n --rawfile m stderr.txt '{version: 2, status: "error", message:$m}' > $OUTPUT_DIR/results.json
+   jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
    echo "Finished with error"
    exit 0
 fi
