@@ -53,6 +53,11 @@ if [ $STATUS -ne 0 ] && [ $STATUS -ne 2 ]; then
    echo "Finished with error"
    exit 0
 fi
-set -e
 
+# Extract test code
+cat tests/Tests.elm | node ../bin/cli.js > $OUTPUT_DIR/test_code.json 2> stderr.txt
+STATUS=$?
+cat stderr.txt
+
+set -e
 echo Finished
