@@ -58,6 +58,17 @@ fi
 cat tests/Tests.elm | node ../bin/cli.js > $OUTPUT_DIR/test_code.json 2> stderr.txt
 STATUS=$?
 cat stderr.txt
+if [ $STATUS -ne 0 ]; then
+   echo "An error occurred while extracting the test code from the test file."
+   exit 0
+fi
+
+cd $OUTPUT_DIR
+# Merge tests results with extracted test code and save it in concat.json
+jq -s '.[0].tests + .[1] | group_by(.name) | map(add) | map(.test_code = .testCode) | map(del(.testCode))' results.json test_code.json > concat.json
+# Replace the merged tests results in results.json
+jq -s '.[0].tests = .[1] | .[0]' results.json concat.json > results_with_code.json
+mv results_with_code.json results.json
 
 set -e
 echo Finished
