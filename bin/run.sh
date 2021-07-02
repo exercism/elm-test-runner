@@ -62,6 +62,7 @@ if [ $STATUS -ne 0 ]; then
    echo "An error occurred while extracting the test code from the test file."
    exit 0
 fi
+set -e
 
 cd $OUTPUT_DIR
 # Merge tests results with extracted test code and save it in concat.json
@@ -70,5 +71,4 @@ jq -s '.[0].tests + .[1] | group_by(.name) | map(add) | map(.test_code = .testCo
 jq -s '.[0].tests = .[1] | .[0]' results.json concat.json > results_with_code.json
 mv results_with_code.json results.json
 
-set -e
 echo Finished
