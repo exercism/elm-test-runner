@@ -7,9 +7,24 @@ import Elm.Syntax.Expression exposing (..)
 import Elm.Syntax.Node as Node
 import Elm.Syntax.Range exposing (emptyRange)
 import Elm.Writer exposing (writeExpression)
+import Json.Encode
 import Parser
 import String exposing (fromInt)
 import StructuredWriter exposing (..)
+
+
+type alias ExtractedTest =
+    { name : String
+    , testCode : String
+    }
+
+
+encode : ExtractedTest -> Json.Encode.Value
+encode extractedTest =
+    Json.Encode.object
+        [ ( "name", Json.Encode.string extractedTest.name )
+        , ( "testCode", Json.Encode.string extractedTest.testCode )
+        ]
 
 
 extractTestCode : String -> String
@@ -23,7 +38,10 @@ extractTestCode original =
                 |> .declarations
                 |> List.map Node.value
                 |> List.concatMap extractFromDeclaration
-                |> testsToString
+                -- |> testsToString
+                |> List.map toExtractedTest
+                |> Json.Encode.list encode
+                |> Json.Encode.encode 2
 
 
 deadEndsToString deadEnds =
@@ -81,17 +99,25 @@ problemToString problem =
             "Bad repeat"
 
 
-testsToString : List ( String, Expression ) -> String
-testsToString tests =
-    List.map testToWriter tests
-        |> breaked
-        |> write
+
+-- testsToString : List ( String, Expression ) -> String
+-- testsToString tests =
+--     List.map testToWriter tests
+--         |> breaked
+--         |> write
+-- testToWriter : ( String, Expression ) -> Writer
+-- testToWriter ( name, code ) =
+--     [ string name, writeExpression (Node.Node emptyRange code) ]
+--         |> breaked
 
 
-testToWriter : ( String, Expression ) -> Writer
-testToWriter ( name, code ) =
-    [ string name, writeExpression (Node.Node emptyRange code) ]
-        |> breaked
+toExtractedTest : ( String, Expression ) -> ExtractedTest
+toExtractedTest ( name, code ) =
+    { name = name
+    , testCode =
+        writeExpression (Node.Node emptyRange code)
+            |> write
+    }
 
 
 extractFromDeclaration : Declaration -> List ( String, Expression )

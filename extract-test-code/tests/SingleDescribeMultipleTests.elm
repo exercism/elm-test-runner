@@ -2,6 +2,7 @@ module SingleDescribeMultipleTests exposing (..)
 
 import Expect exposing (Expectation)
 import ExtractTestCode
+import Json.Encode
 import Test exposing (..)
 
 
@@ -35,19 +36,28 @@ tests =
         ]
 """
                 |> ExtractTestCode.extractTestCode
-                |> Expect.equal """Cannot execute fast attack if knight is awake
-let
+                |> Expect.equal
+                    (Json.Encode.encode 2
+                        (Json.Encode.list ExtractTestCode.encode
+                            [ { name = "Cannot execute fast attack if knight is awake"
+                              , testCode = """let
   
   
   knightIsAwake  =
       True
 in
-  canFastAttack knightIsAwake |> Expect.equal False
-Can execute fast attack if knight is sleeping
-let
+  canFastAttack knightIsAwake |> Expect.equal False"""
+                              }
+                            , { name = "Can execute fast attack if knight is sleeping"
+                              , testCode =
+                                    """let
   
   
   knightIsAwake  =
       False
 in
   canFastAttack knightIsAwake |> Expect.equal True"""
+                              }
+                            ]
+                        )
+                    )
