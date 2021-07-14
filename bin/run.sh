@@ -44,15 +44,31 @@ sed -i 's/skip <|//g' tests/Tests.elm
 
 # Temporarily disable -e mode
 set +e
-elm-test-rs --quiet --report exercism --connectivity offline > $OUTPUT_DIR/results.json 2> stderr.txt
+elm-test-rs -v --report exercism --offline > $OUTPUT_DIR/results.json 2> stderr.txt
 STATUS=$?
 cat stderr.txt
 # elm-test-rs will exit(0) if tests pass, exit(2) if tests fail
 if [ $STATUS -ne 0 ] && [ $STATUS -ne 2 ]; then
-   jq -n --rawfile m stderr.txt '{version: 2, status: "error", message:$m}' > $OUTPUT_DIR/results.json
+   jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
    echo "Finished with error"
    exit 0
 fi
+
+# Extract test code
+cat tests/Tests.elm | node ../bin/cli.js > $OUTPUT_DIR/test_code.json 2> stderr.txt
+STATUS=$?
+cat stderr.txt
+if [ $STATUS -ne 0 ]; then
+   echo "An error occurred while extracting the test code from the test file."
+   exit 0
+fi
 set -e
+
+cd $OUTPUT_DIR
+# Merge tests results with extracted test code.
+# This rely on the fact that the order is the same in both arrays.
+jq -s '[range(.[1]|length) as $i | .[0].tests[$i] + { test_code: .[1][$i].testCode }]' results.json test_code.json > concat.json
+jq -s '.[0].tests = .[1] | .[0]' results.json concat.json > results_with_code.json
+mv results_with_code.json results.json
 
 echo Finished

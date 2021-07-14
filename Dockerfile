@@ -20,7 +20,7 @@ RUN curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/b
   && chmod +x bin/elm
 
 # Install elm-test-rs
-RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-rs/releases/download/v0.6.1/elm-test-rs_linux.tar.gz \
+RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-rs/releases/download/v1.1/elm-test-rs_linux.tar.gz \
   && tar xf elm-test-rs_linux.tar.gz \
   && mv elm-test-rs bin
 
@@ -30,10 +30,17 @@ RUN curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/master/te
   && mkdir src \
   && elm-test-rs init \
   && elm-test-rs || true
+RUN tar cf cache.tar elm-stuff .elm elm.json
+
+# Build the test code extractor
+COPY extract-test-code extract-test-code
+RUN cd extract-test-code \
+  && elm make --optimize src/Main.elm --output=src/main.js \
+  && cd src \
+  && cp cli.js main.js ../../bin
 
 # Pack together things to copy to the runner container
 COPY bin/run.sh bin/run.sh
-RUN tar cf cache.tar elm-stuff .elm elm.json
 
 # Lightweight runner container
 FROM node:lts-alpine
