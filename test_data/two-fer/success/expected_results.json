@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "status": "pass",
+  "tests": [
+    {
+      "name": "No name given",
+      "task_id": null,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "Expect.equal \"One for you, one for me.\" (twoFer Nothing)"
+    },
+    {
+      "name": "A name given",
+      "task_id": null,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "Expect.equal \"One for Alice, one for me.\" (twoFer (Just \"Alice\"))"
+    },
+    {
+      "name": "Another name given",
+      "task_id": null,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "Expect.equal \"One for Bob, one for me.\" (twoFer (Just \"Bob\"))"
+    }
+  ]
+}

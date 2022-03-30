@@ -1,0 +1,38 @@
+{
+  "version": 3,
+  "status": "pass",
+  "tests": [
+    {
+      "name": "all good",
+      "task_id": 1,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "expectedMinutesInOven\n |> Expect.equal 40"
+    },
+    {
+      "name": "unexpected skip in concept exercise, will be ran anyway",
+      "task_id": 2,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "preparationTimeInMinutes 2\n |> Expect.equal 4"
+    },
+    {
+      "name": "Missing task ID",
+      "task_id": null,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "elapsedTimeInMinutes 3 10\n |> Expect.equal 16"
+    },
+    {
+      "name": "wrong task ID format",
+      "task_id": null,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "elapsedTimeInMinutes 6 30\n |> Expect.equal 42"
+    }
+  ]
+}

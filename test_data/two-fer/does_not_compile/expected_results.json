@@ -1,0 +1,5 @@
+{
+  "version": 3,
+  "status": "error",
+  "message": "\nelm-test-rs 2.0.0 for elm 0.19.1\n--------------------------------\n\n-- UNFINISHED DEFINITION -------------------------- /tmp/solution/src/TwoFer.elm\n\nI got stuck while parsing the `twoFer` definition:\n\n4| twoFer : Maybe String -> String\n5| twoFer name =\n                ^\nI was expecting to see an expression next. What is it equal to?\n\nHere is a valid definition (with a type annotation) for reference:\n\n    greet : String -> String\n    greet name =\n      \"Hello \" ++ name ++ \"!\"\n\nThe top line (called a \"type annotation\") is optional. You can leave it off if\nyou want. As you get more comfortable with Elm and as your project grows, it\nbecomes more and more valuable to add them though! They work great as\ncompiler-verified documentation, and they often improve error messages!\n\n"
+}
