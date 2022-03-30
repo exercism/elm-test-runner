@@ -7,3 +7,8 @@
 .netlify
 
 elm-stuff
+
+# smoke test intermediate files
+test_code.json
+test_results.json
+results.json

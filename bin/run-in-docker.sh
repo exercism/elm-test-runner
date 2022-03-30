@@ -43,6 +43,9 @@ docker build -t elm-test-runner .
 # run image passing the arguments
 mkdir -p "$OUTPUT_DIR"
 docker run --network none \
+    --rm \
+    --read-only \
     --mount type=bind,src=$INPUT_DIR,dst=/solution \
     --mount type=bind,src=$OUTPUT_DIR,dst=/output \
+    --mount type=tmpfs,dst=/tmp \
     elm-test-runner $SLUG /solution/ /output/

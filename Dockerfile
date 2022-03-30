@@ -41,10 +41,13 @@ RUN cd extract-test-code \
 
 # Pack together things to copy to the runner container
 COPY bin/run.sh bin/run.sh
+COPY bin/smoke_test.sh bin/smoke_test.sh
+COPY bin/check_files.sh bin/check_files.sh
 
 # Lightweight runner container
 FROM node:lts-alpine
 WORKDIR /opt/test-runner
+ENV PATH="/opt/test-runner/bin:${PATH}"
 COPY --from=builder /opt/test-runner/bin bin
 COPY --from=builder /opt/test-runner/cache.tar .
 ENTRYPOINT [ "bin/run.sh" ]
