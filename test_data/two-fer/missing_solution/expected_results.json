@@ -1,5 +1,0 @@
-{
-  "version": 3,
-  "status": "error",
-  "message": "\nelm-test-rs 2.0.0 for elm 0.19.1\n--------------------------------\n\n-- MODULE NOT FOUND ------------------------------ /tmp/solution/tests/Tests.elm\n\nYou are trying to import a `TwoFer` module:\n\n6| import TwoFer exposing (twoFer)\n          ^^^^^^\nI checked the \"dependencies\" and \"source-directories\" listed in your elm.json,\nbut I cannot find it! Maybe it is a typo for one of these names?\n\n    Parser\n    Runner\n    Time\n    Bitwise\n\nHint: If it is not a typo, check the \"dependencies\" and \"source-directories\" of\nyour elm.json to make sure all the packages you need are listed there!\n\n"
-}

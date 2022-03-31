@@ -1,5 +1,0 @@
-{
-  "version": 3,
-  "status": "error",
-  "message": "Number of tests doesn't match number of extracted code snippets. Please report this issue."
-}
