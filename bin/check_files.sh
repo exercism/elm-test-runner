@@ -1,9 +1,9 @@
 #!/bin/sh
 #
-#  This script is called by bin/smoke_test.hs
+#  This script is called by bin/smoke_test.sh
 #
 #  It checks that for a given exercise path (given as argument)
-#    1. The analyzer created an output file
+#    1. The test runner created an output file
 #    2. There is a reference file available for comparison
 #    3. Both files are identical
 #
