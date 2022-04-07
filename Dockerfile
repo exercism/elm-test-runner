@@ -20,7 +20,7 @@ RUN curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/b
   && chmod +x bin/elm
 
 # Install elm-test-rs
-RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-rs/releases/download/v2.0/elm-test-rs_linux.tar.gz \
+RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-rs/releases/download/v2.0.1/elm-test-rs_linux.tar.gz \
   && tar xf elm-test-rs_linux.tar.gz \
   && mv elm-test-rs bin
 
