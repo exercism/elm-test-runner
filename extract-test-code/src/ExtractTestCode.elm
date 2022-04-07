@@ -4,7 +4,7 @@ import Elm.Parser
 import Elm.Processing exposing (init, process)
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression exposing (..)
-import Elm.Syntax.Node as Node
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (emptyRange)
 import Elm.Writer exposing (writeExpression)
 import Json.Encode
@@ -36,19 +36,19 @@ extractTestCode original =
         Ok rawFile ->
             process init rawFile
                 |> .declarations
-                |> List.map Node.value
-                |> List.concatMap extractFromDeclaration
-                -- |> testsToString
+                |> List.concatMap findTestsInDeclaration
                 |> List.map toExtractedTest
                 |> Json.Encode.list encode
                 |> Json.Encode.encode 2
 
 
+deadEndsToString : List Parser.DeadEnd -> String
 deadEndsToString deadEnds =
     List.map deadEndToString deadEnds
-        |> String.join "/n"
+        |> String.join "\n"
 
 
+deadEndToString : Parser.DeadEnd -> String
 deadEndToString deadEnd =
     "( " ++ fromInt deadEnd.row ++ ", " ++ fromInt deadEnd.col ++ " ): " ++ problemToString deadEnd.problem
 
@@ -99,18 +99,6 @@ problemToString problem =
             "Bad repeat"
 
 
-
--- testsToString : List ( String, Expression ) -> String
--- testsToString tests =
---     List.map testToWriter tests
---         |> breaked
---         |> write
--- testToWriter : ( String, Expression ) -> Writer
--- testToWriter ( name, code ) =
---     [ string name, writeExpression (Node.Node emptyRange code) ]
---         |> breaked
-
-
 toExtractedTest : ( String, Expression ) -> ExtractedTest
 toExtractedTest ( name, code ) =
     { name = name
@@ -120,92 +108,95 @@ toExtractedTest ( name, code ) =
     }
 
 
-extractFromDeclaration : Declaration -> List ( String, Expression )
-extractFromDeclaration declaration =
+findTestsInDeclaration : Node Declaration -> List ( String, Expression )
+findTestsInDeclaration (Node _ declaration) =
     case declaration of
         Declaration.FunctionDeclaration functionDeclaration ->
-            extractFromFunction functionDeclaration
+            findTestsInFunction [] functionDeclaration
 
         _ ->
             []
 
 
-extractFromFunction : Function -> List ( String, Expression )
-extractFromFunction functionDeclaration =
+findTestsInFunction : List String -> Function -> List ( String, Expression )
+findTestsInFunction path { declaration } =
     let
-        name =
-            functionDeclaration.declaration |> Node.value |> .name |> Node.value
-
-        expression =
-            functionDeclaration.declaration |> Node.value |> .expression |> Node.value
+        (Node _ { expression }) =
+            declaration
     in
-    -- This requires the top level function in a test module to be called "tests"
-    -- We could instead require it to have a type annotation that specifies a
-    -- function with no parameters that returns a Test
-    if name == "tests" then
-        extractFromExpression expression
-
-    else
-        []
+    findTestsInExpression path expression
 
 
-extractFromExpression : Expression -> List ( String, Expression )
-extractFromExpression expression =
+findTestsInExpression : List String -> Node Expression -> List ( String, Expression )
+findTestsInExpression path (Node _ expression) =
     case expression of
-        Application nodeExpressions ->
-            let
-                expressions =
-                    List.map Node.value nodeExpressions
-            in
-            case expressions of
-                (FunctionOrValue _ functionName) :: xs ->
-                    if functionName == "describe" then
-                        extractFromDescribeFunction xs
+        -- Only detects tests with names as a literal
+        Application [ Node _ (FunctionOrValue _ "test"), Node _ (Literal name), Node _ (LambdaExpression test) ] ->
+            [ ( (name :: path)
+                    |> List.reverse
+                    |> List.drop 1
+                    |> String.join " > "
+              , Node.value test.expression
+              )
+            ]
 
-                    else if functionName == "test" then
-                        extractFromTestFunction xs
+        -- Only detects describes with names as a literal
+        Application [ Node _ (FunctionOrValue _ "describe"), Node _ (Literal name), tests ] ->
+            findTestsInExpression (name :: path) tests
 
-                    else
-                        []
+        Application expressions ->
+            List.concatMap (findTestsInExpression path) expressions
 
-                _ ->
-                    []
+        OperatorApplication "<|" _ (Node range (Application app)) right ->
+            findTestsInExpression path (Node range (Application (app ++ [ right ])))
 
-        OperatorApplication _ _ left right ->
-            case Node.value left of
-                Application nodeExpressions2 ->
-                    extractFromExpression (Application (nodeExpressions2 ++ [ right ]))
+        OperatorApplication "|>" _ left (Node range (Application app)) ->
+            findTestsInExpression path (Node range (Application (app ++ [ left ])))
 
-                _ ->
-                    []
+        OperatorApplication _ _ a b ->
+            List.concatMap (findTestsInExpression path) [ a, b ]
 
+        IfBlock _ a b ->
+            List.concatMap (findTestsInExpression path) [ a, b ]
+
+        TupledExpression expressions ->
+            List.concatMap (findTestsInExpression path) expressions
+
+        ParenthesizedExpression expr ->
+            findTestsInExpression path expr
+
+        LetExpression letBlock ->
+            List.concatMap (finTestsInLetDeclaration path) letBlock.declarations
+                ++ findTestsInExpression path letBlock.expression
+
+        CaseExpression { cases } ->
+            List.concatMap (Tuple.second >> findTestsInExpression path) cases
+
+        LambdaExpression lambda ->
+            findTestsInExpression path lambda.expression
+
+        RecordExpr records ->
+            List.concatMap (\(Node _ ( _, expr )) -> findTestsInExpression path expr) records
+
+        ListExpr list ->
+            List.concatMap (findTestsInExpression path) list
+
+        RecordAccess expr _ ->
+            findTestsInExpression path expr
+
+        RecordUpdateExpression _ records ->
+            List.concatMap (\(Node _ ( _, expr )) -> findTestsInExpression path expr) records
+
+        -- Other variants without recursive expressions
         _ ->
             []
 
 
-{-| describe function should have a string parameter and a
-list (of tests or desribe functions, which return a Test)
-parameter. We want to process this list
--}
-extractFromDescribeFunction : List Expression -> List ( String, Expression )
-extractFromDescribeFunction expressions =
-    case expressions of
-        _ :: (ListExpr testOrDescribes) :: [] ->
-            List.concatMap extractFromExpression (List.map Node.value testOrDescribes)
+finTestsInLetDeclaration : List String -> Node LetDeclaration -> List ( String, Expression )
+finTestsInLetDeclaration path (Node _ letDeclaration) =
+    case letDeclaration of
+        LetFunction function ->
+            findTestsInFunction path function
 
-        _ ->
-            []
-
-
-{-| test function should have a string parameter to describe
-the test, and then a function for the test. Only lambdas are
-supported as the second parameter
--}
-extractFromTestFunction : List Expression -> List ( String, Expression )
-extractFromTestFunction expressions =
-    case expressions of
-        (Literal name) :: (LambdaExpression test) :: [] ->
-            [ ( name, Node.value test.expression ) ]
-
-        _ ->
-            []
+        LetDestructuring _ expr ->
+            findTestsInExpression path expr
