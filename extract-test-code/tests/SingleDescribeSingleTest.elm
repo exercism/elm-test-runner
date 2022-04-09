@@ -43,32 +43,4 @@ in
                                 ]
                             )
                         )
-        , test "Can extract single test with let in describe wrapper" <|
-            \_ ->
-                """module AnnalynsInfiltrationTests exposing (tests)
-
-import Test exposing (..)
-
-tests : Test
-tests =
-    describe "AnnalynsInfiltration"
-      (let knightIsAwake = True
-       in
-        [ test "Cannot execute fast attack if knight is awake" <|
-            \\_ ->
-                canFastAttack knightIsAwake
-                    |> Expect.equal False
-        ]
-      )"""
-                    |> ExtractTestCode.extractTestCode
-                    |> Expect.equal
-                        (Json.Encode.encode 2
-                            (Json.Encode.list ExtractTestCode.encode
-                                [ { name = "Cannot execute fast attack if knight is awake"
-                                  , testCode = """canFastAttack knightIsAwake
- |> Expect.equal False"""
-                                  }
-                                ]
-                            )
-                        )
         ]
