@@ -143,14 +143,14 @@ extractFromFunction functionDeclaration =
     -- We could instead require it to have a type annotation that specifies a
     -- function with no parameters that returns a Test
     if name == "tests" then
-        extractFromExpression expression
+        extractFromExpression [] expression
 
     else
         []
 
 
-extractFromExpression : Expression -> List ( String, Expression )
-extractFromExpression expression =
+extractFromExpression : List String -> Expression -> List ( String, Expression )
+extractFromExpression descriptions expression =
     case expression of
         Application nodeExpressions ->
             let
@@ -160,10 +160,10 @@ extractFromExpression expression =
             case expressions of
                 (FunctionOrValue _ functionName) :: xs ->
                     if functionName == "describe" then
-                        extractFromDescribeFunction xs
+                        extractFromDescribeFunction descriptions xs
 
                     else if functionName == "test" then
-                        extractFromTestFunction xs
+                        extractFromTestFunction descriptions xs
 
                     else
                         []
@@ -174,7 +174,7 @@ extractFromExpression expression =
         OperatorApplication _ _ left right ->
             case Node.value left of
                 Application nodeExpressions2 ->
-                    extractFromExpression (Application (nodeExpressions2 ++ [ right ]))
+                    extractFromExpression descriptions (Application (nodeExpressions2 ++ [ right ]))
 
                 _ ->
                     []
@@ -187,11 +187,11 @@ extractFromExpression expression =
 list (of tests or desribe functions, which return a Test)
 parameter. We want to process this list
 -}
-extractFromDescribeFunction : List Expression -> List ( String, Expression )
-extractFromDescribeFunction expressions =
+extractFromDescribeFunction : List String -> List Expression -> List ( String, Expression )
+extractFromDescribeFunction descriptions expressions =
     case expressions of
-        _ :: (ListExpr testOrDescribes) :: [] ->
-            List.concatMap extractFromExpression (List.map Node.value testOrDescribes)
+        (Literal description) :: (ListExpr testOrDescribes) :: [] ->
+            List.concatMap (extractFromExpression (description :: descriptions)) (List.map Node.value testOrDescribes)
 
         _ ->
             []
@@ -201,11 +201,17 @@ extractFromDescribeFunction expressions =
 the test, and then a function for the test. Only lambdas are
 supported as the second parameter
 -}
-extractFromTestFunction : List Expression -> List ( String, Expression )
-extractFromTestFunction expressions =
+extractFromTestFunction : List String -> List Expression -> List ( String, Expression )
+extractFromTestFunction descriptions expressions =
     case expressions of
         (Literal name) :: (LambdaExpression test) :: [] ->
-            [ ( name, Node.value test.expression ) ]
+            [ ( (name :: descriptions)
+                    |> List.reverse
+                    |> List.drop 1
+                    |> String.join " > "
+              , Node.value test.expression
+              )
+            ]
 
         _ ->
             []

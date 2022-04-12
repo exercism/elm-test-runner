@@ -1,6 +1,6 @@
 module SingleDescribeMultipleTests exposing (..)
 
-import Expect exposing (Expectation)
+import Expect
 import ExtractTestCode
 import Json.Encode
 import Test exposing (..)
