@@ -3,7 +3,7 @@
   "status": "fail",
   "tests": [
     {
-      "name": "The expected amount of time in the oven is 40 minutes",
+      "name": "1 > The expected amount of time in the oven is 40 minutes",
       "task_id": 1,
       "status": "fail",
       "message": "\n    40000\n    ╷\n    │ Expect.equal\n    ╵\n    40\n\n",
@@ -11,7 +11,7 @@
       "test_code": "expectedMinutesInOven\n |> Expect.equal 40"
     },
     {
-      "name": "For 2 layers, the preparation time is 4 minutes",
+      "name": "2 > For 2 layers, the preparation time is 4 minutes",
       "task_id": 2,
       "status": "pass",
       "message": null,
@@ -19,7 +19,7 @@
       "test_code": "preparationTimeInMinutes 2\n |> Expect.equal 4"
     },
     {
-      "name": "For 5 layers, the preparation time is 10 minutes",
+      "name": "2 > For 5 layers, the preparation time is 10 minutes",
       "task_id": 2,
       "status": "pass",
       "message": null,
@@ -27,7 +27,7 @@
       "test_code": "preparationTimeInMinutes 5\n |> Expect.equal 10"
     },
     {
-      "name": "For a 3-layers lasagna already in the oven for 10 minutes, you've spent 16 minutes cooking",
+      "name": "3 > For a 3-layers lasagna already in the oven for 10 minutes, you've spent 16 minutes cooking",
       "task_id": 3,
       "status": "pass",
       "message": null,
@@ -35,7 +35,7 @@
       "test_code": "elapsedTimeInMinutes 3 10\n |> Expect.equal 16"
     },
     {
-      "name": "For a 6-layers lasagna already in the oven for 30 minutes, you've spent 42 minutes cooking",
+      "name": "3 > For a 6-layers lasagna already in the oven for 30 minutes, you've spent 42 minutes cooking",
       "task_id": 3,
       "status": "pass",
       "message": null,

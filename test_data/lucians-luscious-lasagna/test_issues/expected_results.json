@@ -3,7 +3,7 @@
   "status": "pass",
   "tests": [
     {
-      "name": "all good",
+      "name": "1 > all good",
       "task_id": 1,
       "status": "pass",
       "message": null,
@@ -11,7 +11,7 @@
       "test_code": "expectedMinutesInOven\n |> Expect.equal 40"
     },
     {
-      "name": "unexpected skip in concept exercise, will be ran anyway",
+      "name": "2 > unexpected skip in concept exercise, will be ran anyway",
       "task_id": 2,
       "status": "pass",
       "message": null,
@@ -27,7 +27,7 @@
       "test_code": "elapsedTimeInMinutes 3 10\n |> Expect.equal 16"
     },
     {
-      "name": "wrong task ID format",
+      "name": "#3 > wrong task ID format",
       "task_id": null,
       "status": "pass",
       "message": null,
