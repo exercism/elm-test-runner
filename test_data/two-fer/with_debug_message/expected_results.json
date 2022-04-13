@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "status": "fail",
+  "tests": [
+    {
+      "name": "No log since test will pass",
+      "task_id": null,
+      "status": "pass",
+      "message": null,
+      "output": null,
+      "test_code": "Expect.equal \"One for you, one for me.\" (twoFer Nothing)"
+    },
+    {
+      "name": "Will be logged",
+      "task_id": null,
+      "status": "fail",
+      "message": "\n             ▼▼▼              \n    \"One for you, one for me.\"\n    ╷\n    │ Expect.equal\n    ╵\n    \"One for Alice, one for me.\"\n             ▲▲▲▲▲              \n\n",
+      "output": "Log variable: Just \"Alice\"\n\nLog constant: 42\n",
+      "test_code": "Expect.equal \"One for Alice, one for me.\" (twoFer (Just \"Alice\"))"
+    },
+    {
+      "name": "Will be logged too",
+      "task_id": null,
+      "status": "fail",
+      "message": "\n             ▼ ▼              \n    \"One for you, one for me.\"\n    ╷\n    │ Expect.equal\n    ╵\n    \"One for Bob, one for me.\"\n             ▲ ▲              \n\n",
+      "output": "Log variable: Just \"Bob\"\n\nLog constant: 42\n",
+      "test_code": "Expect.equal \"One for Bob, one for me.\" (twoFer (Just \"Bob\"))"
+    }
+  ]
+}
