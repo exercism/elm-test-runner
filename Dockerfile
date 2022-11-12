@@ -42,6 +42,7 @@ RUN cd extract-test-code \
 # Pack together things to copy to the runner container
 COPY bin/run.sh bin/run.sh
 COPY bin/smoke_test.sh bin/smoke_test.sh
+COPY bin/run_all_exercises.sh bin/run_all_exercises.sh
 
 # Lightweight runner container
 FROM node:lts-alpine
