@@ -23,6 +23,7 @@ do
 done
 
 # Copy exemplar files in solution
+echo "Copying concept exemplar solutions ..."
 for exercise_dir in "$exercices/concept"/*
 do
   solution=$(jq --raw-output '.files.solution | .[0]' "$exercise_dir/.meta/config.json")
@@ -31,6 +32,7 @@ do
 done
 
 # Copy example files in solution
+echo "Copying practice example solutions ..."
 for exercise_dir in "$exercices/practice"/*
 do
   solution=$(jq --raw-output '.files.solution | .[0]' "$exercise_dir/.meta/config.json")
@@ -39,6 +41,7 @@ do
 done
 
 # Run tests
+echo "Running test for all solutions ..."
 for exercise_dir in "$exercices"/*/*
 do
   bin/run.sh "ignored_slug" $exercise_dir $exercise_dir > /dev/null
