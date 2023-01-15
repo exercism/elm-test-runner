@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# This script is meant to run in the exercism/elm CI
-
 set -e # Make script exit when a command fail.
 set -u # Exit on usage of undeclared variable.
 # set -x # Trace what gets executed.
