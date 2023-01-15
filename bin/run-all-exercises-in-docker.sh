@@ -8,7 +8,7 @@ set -u # Exit on usage of undeclared variable.
 set -o pipefail # Catch failures in pipes.
 
 # Command line argument
-elm_repo_dir=$1
+elm_repo_dir=$(realpath $1)
 
 # build docker image
 docker build --rm -t elm-test-runner .
@@ -18,7 +18,7 @@ docker run \
     --rm \
     --read-only \
     --network none \
-    --mount type=bind,src=$(realpath $elm_repo_dir),dst=/opt/test-runner/elm_repo \
+    --mount type=bind,src="$elm_repo_dir",dst=/opt/test-runner/elm_repo \
     --mount type=tmpfs,dst=/tmp \
     --volume "${elm_repo_dir}/bin/run_all_exercises.sh:/opt/test-runner/bin/run_all_exercises.sh" \
     --entrypoint /opt/test-runner/bin/run_all_exercises.sh \
