@@ -26,7 +26,7 @@ RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-r
 
 # Build the elm cache in both .elm/ and elm-stuff/
 ENV ELM_HOME="/opt/test-runner/.elm"
-RUN curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/master/template/elm.json \
+RUN  curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/af92b6f45a64d92c9c7b33d709e2ccf3e1288715/template/elm.json \
   && mkdir src \
   && elm-test-rs init \
   && elm-test-rs || true
