@@ -20,13 +20,13 @@ RUN curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/b
   && chmod +x bin/elm
 
 # Install elm-test-rs
-RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-rs/releases/download/v2.0.1/elm-test-rs_linux.tar.gz \
+RUN curl -L -o elm-test-rs_linux.tar.gz https://github.com/mpizenberg/elm-test-rs/releases/download/v3.0/elm-test-rs_linux.tar.gz \
   && tar xf elm-test-rs_linux.tar.gz \
   && mv elm-test-rs bin
 
 # Build the elm cache in both .elm/ and elm-stuff/
 ENV ELM_HOME="/opt/test-runner/.elm"
-RUN curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/master/template/elm.json \
+RUN curl -L -o elm.json https://raw.githubusercontent.com/exercism/elm/main/template/elm.json \
   && mkdir src \
   && elm-test-rs init \
   && elm-test-rs || true
