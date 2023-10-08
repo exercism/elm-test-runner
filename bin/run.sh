@@ -44,7 +44,7 @@ cat stderr.txt 1>&2
 if [ $STATUS -ne 0 ]; then
     jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
     echo "An error occured while un-skipping the tests." 1>&2
-    exit 1
+    exit 0
 fi
 
 # Run the tests
@@ -55,7 +55,7 @@ cat stderr.txt
 if [ $STATUS -ne 0 ] && [ $STATUS -ne 2 ]; then
     jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
     echo "An error occured while running the tests." 1>&2
-    exit 1
+    exit 0
 fi
 
 # Extract test code
@@ -65,7 +65,7 @@ cat stderr.txt
 if [ $STATUS -ne 0 ]; then
     jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
     echo "An error occurred while extracting the test code snippets." 1>&2
-    exit 1
+    exit 0
 fi
 
 # Check number of tests matches number of extracted code snippets
@@ -75,7 +75,7 @@ if [ $test_code_length -ne $test_result_length ] ; then
     err="Number of tests doesn't match number of extracted code snippets. Please report this issue at https://github.com/exercism/elm-test-runner/issues."
     jq -n --arg m "${err}" '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
     echo $err 1>&2
-    exit 1
+    exit 0
 fi
 set -e
 
