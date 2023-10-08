@@ -38,7 +38,6 @@ extractTestCode original =
                 |> .declarations
                 |> List.map Node.value
                 |> List.concatMap extractFromDeclaration
-                -- |> testsToString
                 |> List.map toExtractedTest
                 |> Json.Encode.list encode
                 |> Json.Encode.encode 2
@@ -99,18 +98,6 @@ problemToString problem =
             "Bad repeat"
 
 
-
--- testsToString : List ( String, Expression ) -> String
--- testsToString tests =
---     List.map testToWriter tests
---         |> breaked
---         |> write
--- testToWriter : ( String, Expression ) -> Writer
--- testToWriter ( name, code ) =
---     [ string name, writeExpression (Node.Node emptyRange code) ]
---         |> breaked
-
-
 toExtractedTest : ( String, Expression ) -> ExtractedTest
 toExtractedTest ( name, code ) =
     { name = name
@@ -165,6 +152,9 @@ extractFromExpression descriptions expression =
                     else if functionName == "test" then
                         extractFromTestFunction descriptions xs
 
+                    else if List.member functionName [ "fuzz", "fuzz2", "fuzz3", "fuzzWith" ] then
+                        extractFromFuzzFunction descriptions expressions expression
+
                     else
                         []
 
@@ -205,13 +195,38 @@ extractFromTestFunction : List String -> List Expression -> List ( String, Expre
 extractFromTestFunction descriptions expressions =
     case expressions of
         (Literal name) :: (LambdaExpression test) :: [] ->
-            [ ( (name :: descriptions)
-                    |> List.reverse
-                    |> List.drop 1
-                    |> String.join " > "
-              , Node.value test.expression
-              )
-            ]
+            [ ( buildName name descriptions, Node.value test.expression ) ]
 
         _ ->
             []
+
+
+{-| fuzz functions should have a string parameter to describe
+the test. The full fuzz function is printed because the arguments
+are necessary to understand the test
+-}
+extractFromFuzzFunction : List String -> List Expression -> Expression -> List ( String, Expression )
+extractFromFuzzFunction descriptions expressions topExpression =
+    case expressions of
+        [ FunctionOrValue _ "fuzz", _, Literal name, _ ] ->
+            [ ( buildName name descriptions, topExpression ) ]
+
+        [ FunctionOrValue _ "fuzz2", _, _, Literal name, _ ] ->
+            [ ( buildName name descriptions, topExpression ) ]
+
+        [ FunctionOrValue _ "fuzz3", _, _, _, Literal name, _ ] ->
+            [ ( buildName name descriptions, topExpression ) ]
+
+        [ FunctionOrValue _ "fuzzWith", _, _, Literal name, _ ] ->
+            [ ( buildName name descriptions, topExpression ) ]
+
+        _ ->
+            []
+
+
+buildName : String -> List String -> String
+buildName name descriptions =
+    (name :: descriptions)
+        |> List.reverse
+        |> List.drop 1
+        |> String.join " > "
