@@ -40,11 +40,11 @@ set +e
 # Un-skip all the skipped tests
 sed -i 's/skip <|//g' tests/Tests.elm 2> stderr.txt
 STATUS=$?
-cat stderr.txt
+cat stderr.txt 1>&2
 if [ $STATUS -ne 0 ]; then
     jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
-    echo "An error occured while un-skipping the tests."
-    exit 0
+    echo "An error occured while un-skipping the tests." 1>&2
+    exit 1
 fi
 
 # Run the tests
@@ -54,8 +54,8 @@ cat stderr.txt
 # elm-test-rs will exit(0) if tests pass, exit(2) if tests fail
 if [ $STATUS -ne 0 ] && [ $STATUS -ne 2 ]; then
     jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
-    echo "An error occured while running the tests."
-    exit 0
+    echo "An error occured while running the tests." 1>&2
+    exit 1
 fi
 
 # Extract test code
@@ -64,8 +64,8 @@ STATUS=$?
 cat stderr.txt
 if [ $STATUS -ne 0 ]; then
     jq -n --rawfile m stderr.txt '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
-    echo "An error occurred while extracting the test code snippets."
-    exit 0
+    echo "An error occurred while extracting the test code snippets." 1>&2
+    exit 1
 fi
 
 # Check number of tests matches number of extracted code snippets
@@ -74,8 +74,8 @@ test_result_length=$(jq '.tests | length' test_results.json)
 if [ $test_code_length -ne $test_result_length ] ; then
     err="Number of tests doesn't match number of extracted code snippets. Please report this issue at https://github.com/exercism/elm-test-runner/issues."
     jq -n --arg m "${err}" '{version: 3, status: "error", message:$m}' > $OUTPUT_DIR/results.json
-    echo $err
-    exit 0
+    echo $err 1>&2
+    exit 1
 fi
 set -e
 
