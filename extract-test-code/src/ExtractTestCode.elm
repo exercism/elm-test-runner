@@ -4,6 +4,7 @@ import Elm.Parser
 import Elm.Processing exposing (init, process)
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression exposing (..)
+import Elm.Syntax.Infix exposing (InfixDirection(..))
 import Elm.Syntax.Node as Node
 import Elm.Syntax.Range exposing (emptyRange)
 import Elm.Writer exposing (writeExpression)
@@ -207,18 +208,32 @@ are necessary to understand the test
 -}
 extractFromFuzzFunction : List String -> List Expression -> Expression -> List ( String, Expression )
 extractFromFuzzFunction descriptions expressions topExpression =
+    let
+        finalExpression =
+            case topExpression of
+                Application nodeExpressions ->
+                    case nodeExpressions |> List.reverse of
+                        lambda :: rest ->
+                            Application (List.reverse (Node.Node emptyRange (ParenthesizedExpression lambda) :: rest))
+
+                        _ ->
+                            topExpression
+
+                _ ->
+                    topExpression
+    in
     case expressions of
         [ FunctionOrValue _ "fuzz", _, Literal name, _ ] ->
-            [ ( buildName name descriptions, topExpression ) ]
+            [ ( buildName name descriptions, finalExpression ) ]
 
         [ FunctionOrValue _ "fuzz2", _, _, Literal name, _ ] ->
-            [ ( buildName name descriptions, topExpression ) ]
+            [ ( buildName name descriptions, finalExpression ) ]
 
         [ FunctionOrValue _ "fuzz3", _, _, _, Literal name, _ ] ->
-            [ ( buildName name descriptions, topExpression ) ]
+            [ ( buildName name descriptions, finalExpression ) ]
 
         [ FunctionOrValue _ "fuzzWith", _, _, Literal name, _ ] ->
-            [ ( buildName name descriptions, topExpression ) ]
+            [ ( buildName name descriptions, finalExpression ) ]
 
         _ ->
             []

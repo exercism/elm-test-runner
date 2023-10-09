@@ -8,7 +8,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzzWith {runs = 1000, distribution = Test.noDistribution}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should be at least 3\"\n \\ability -> Expect.atLeast 3 ability"
+      "test_code": "fuzzWith {runs = 1000, distribution = Test.noDistribution}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should be at least 3\"\n (\\ability -> Expect.atLeast 3 ability)"
     },
     {
       "name": "ability > generated ability should be at most 18",
@@ -16,7 +16,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzzWith {runs = 1000, distribution = Test.noDistribution}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should be at most 18\"\n \\ability -> Expect.atMost 18 ability"
+      "test_code": "fuzzWith {runs = 1000, distribution = Test.noDistribution}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should be at most 18\"\n (\\ability -> Expect.atMost 18 ability)"
     },
     {
       "name": "ability > generated ability should sometimes be 3",
@@ -24,7 +24,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzzWith {runs = 10000\n, distribution = Test.expectDistribution [(Test.Distribution.moreThanZero, \"is 3\", (==) 3)]}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should sometimes be 3\"\n \\_ -> Expect.pass"
+      "test_code": "fuzzWith {runs = 10000\n, distribution = Test.expectDistribution [(Test.Distribution.moreThanZero, \"is 3\", (==) 3)]}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should sometimes be 3\"\n (\\_ -> Expect.pass)"
     },
     {
       "name": "ability > generated ability should sometimes be 18",
@@ -32,7 +32,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzzWith {runs = 1000\n, distribution = Test.expectDistribution [(Test.Distribution.moreThanZero, \"is 18\", (==) 18)]}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should sometimes be 18\"\n \\_ -> Expect.pass"
+      "test_code": "fuzzWith {runs = 1000\n, distribution = Test.expectDistribution [(Test.Distribution.moreThanZero, \"is 18\", (==) 18)]}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"generated ability should sometimes be 18\"\n (\\_ -> Expect.pass)"
     },
     {
       "name": "ability > 13 has an approximate 13% chance of being picked",
@@ -40,7 +40,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzzWith {runs = 10000\n, distribution = Test.expectDistribution [(Test.Distribution.atLeast 10, \"is 13\", (==) 13)\n, (Test.Distribution.atLeast 85, \"is not 13\", (/=) 13)]}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"13 has an approximate 13% chance of being picked\"\n \\_ -> Expect.pass"
+      "test_code": "fuzzWith {runs = 10000\n, distribution = Test.expectDistribution [(Test.Distribution.atLeast 10, \"is 13\", (==) 13)\n, (Test.Distribution.atLeast 85, \"is not 13\", (/=) 13)]}\n (Fuzz.fromGenerator DndCharacter.ability)\n \"13 has an approximate 13% chance of being picked\"\n (\\_ -> Expect.pass)"
     },
     {
       "name": "character > generated character strength should be within range",
@@ -48,7 +48,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character strength should be within range\"\n \\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.strength"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character strength should be within range\"\n (\\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.strength)"
     },
     {
       "name": "character > generated character dexterity should be within range",
@@ -56,7 +56,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character dexterity should be within range\"\n \\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.dexterity"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character dexterity should be within range\"\n (\\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.dexterity)"
     },
     {
       "name": "character > generated character constitution should be within range",
@@ -64,7 +64,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character constitution should be within range\"\n \\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.constitution"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character constitution should be within range\"\n (\\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.constitution)"
     },
     {
       "name": "character > generated character intelligence should be within range",
@@ -72,7 +72,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character intelligence should be within range\"\n \\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.intelligence"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character intelligence should be within range\"\n (\\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.intelligence)"
     },
     {
       "name": "character > generated character wisdom should be within range",
@@ -80,7 +80,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character wisdom should be within range\"\n \\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.wisdom"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character wisdom should be within range\"\n (\\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.wisdom)"
     },
     {
       "name": "character > generated character charisma should be within range",
@@ -88,7 +88,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character charisma should be within range\"\n \\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.charisma"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character charisma should be within range\"\n (\\character -> Expect.all [Expect.atLeast 3, Expect.atMost 18] character.charisma)"
     },
     {
       "name": "character > generated character hitpoints should be 10 plus the constitution modifier",
@@ -96,7 +96,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character hitpoints should be 10 plus the constitution modifier\"\n \\character -> Expect.equal character.hitpoints (10 + DndCharacter.modifier character.constitution)"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character hitpoints should be 10 plus the constitution modifier\"\n (\\character -> Expect.equal character.hitpoints (10 + DndCharacter.modifier character.constitution))"
     },
     {
       "name": "character > generated character abilities are not all equal",
@@ -104,7 +104,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character abilities are not all equal\"\n \\character -> let\n  \n  \n  uniqueAbilities {strength, dexterity, constitution, intelligence, wisdom, charisma} =\n      [strength, dexterity, constitution, intelligence, wisdom, charisma] |> Set.fromList |> Set.size\nin\n  Expect.atLeast 2 (uniqueAbilities character)"
+      "test_code": "fuzz (Fuzz.fromGenerator DndCharacter.character)\n \"generated character abilities are not all equal\"\n (\\character -> let\n  \n  \n  uniqueAbilities {strength, dexterity, constitution, intelligence, wisdom, charisma} =\n      [strength, dexterity, constitution, intelligence, wisdom, charisma] |> Set.fromList |> Set.size\nin\n  Expect.atLeast 2 (uniqueAbilities character))"
     },
     {
       "name": "character > generated characters are not all equal",
@@ -112,7 +112,7 @@
       "status": "pass",
       "message": null,
       "output": null,
-      "test_code": "fuzzWith {runs = 1000\n, distribution = Test.expectDistribution [(Test.Distribution.atLeast 40, \"has low charisma\", \\char -> char.charisma <= 12)\n, (Test.Distribution.atLeast 40, \"has high charisma\", \\char -> char.charisma > 12)\n, (Test.Distribution.atLeast 40, \"has low strength\", \\char -> char.strength <= 12)\n, (Test.Distribution.atLeast 40, \"has high strength\", \\char -> char.strength > 12)]}\n (Fuzz.fromGenerator DndCharacter.character)\n \"generated characters are not all equal\"\n \\_ -> Expect.pass"
+      "test_code": "fuzzWith {runs = 1000\n, distribution = Test.expectDistribution [(Test.Distribution.atLeast 40, \"has low charisma\", \\char -> char.charisma <= 12)\n, (Test.Distribution.atLeast 40, \"has high charisma\", \\char -> char.charisma > 12)\n, (Test.Distribution.atLeast 40, \"has low strength\", \\char -> char.strength <= 12)\n, (Test.Distribution.atLeast 40, \"has high strength\", \\char -> char.strength > 12)]}\n (Fuzz.fromGenerator DndCharacter.character)\n \"generated characters are not all equal\"\n (\\_ -> Expect.pass)"
     }
   ]
 }
