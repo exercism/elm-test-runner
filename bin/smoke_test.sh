@@ -14,19 +14,19 @@ for solution in test_data/*/* ; do
 
   # check result
   if [[ ! -f "${solution}/expected_results.json" ]]; then
-    echo "🔥 ${solution}: expected expected_results.json to exist 🔥"
+    echo "🔥 ${solution}: expected expected_results.json to exist 🔥" 1>&2
     exit 1
   fi
 
   if [[ ! -f "${solution}/results.json" ]]; then
-    echo "🔥 ${solution}: expected results.json to exist on successful run 🔥"
+    echo "🔥 ${solution}: expected results.json to exist on successful run 🔥" 1>&2
     exit 1
   fi
 
   jq -S . ${solution}/expected_results.json > /tmp/expected.json
   jq -S . ${solution}/results.json > /tmp/actual.json
   if ! diff /tmp/expected.json /tmp/actual.json ;then
-    echo "🔥 ${solution}: expected results.json to equal expected_results.json on successful run 🔥"
+    echo "🔥 ${solution}: expected results.json to equal expected_results.json on successful run 🔥" 1>&2
     exit 1
   fi
 
