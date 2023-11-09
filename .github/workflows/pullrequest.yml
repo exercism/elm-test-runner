@@ -2,7 +2,7 @@ name: Check the Docker image on PR
 on: pull_request
 jobs:
   build-docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
@@ -28,7 +28,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
   smoke-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
@@ -37,7 +37,7 @@ jobs:
         run: bin/run-tests-in-docker.sh
 
   test-all-exercises:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout elm-test-runner
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
