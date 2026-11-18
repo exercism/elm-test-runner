@@ -1,5 +1,5 @@
-# node:24.18.0-alpine, alpine version 3.24.1
-FROM node:lts-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd AS builder
+# node:lts-alpine as of 2026/11/17
+FROM node:26-alpine3.24@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS builder
 
 # Working directory as specified by exercism
 WORKDIR /opt/test-runner
@@ -45,7 +45,7 @@ COPY bin/run.sh bin/run.sh
 COPY bin/smoke_test.sh bin/smoke_test.sh
 
 # Lightweight runner container
-FROM node:lts-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd
+FROM node:26-alpine3.24@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5
 WORKDIR /opt/test-runner
 ENV PATH="/opt/test-runner/bin:${PATH}"
 COPY --from=builder /opt/test-runner/bin bin
